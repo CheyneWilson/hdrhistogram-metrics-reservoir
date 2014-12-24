@@ -4,6 +4,7 @@ import com.codahale.metrics.Snapshot;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.HistogramIterationValue;
 
+import javax.annotation.Nonnull;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -13,7 +14,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 final class HistogramSnapshot extends Snapshot {
     private final Histogram histogram;
 
-    HistogramSnapshot(Histogram histogram) {
+    HistogramSnapshot(@Nonnull Histogram histogram) {
         this.histogram = histogram;
     }
 

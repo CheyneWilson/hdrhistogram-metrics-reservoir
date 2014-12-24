@@ -1,15 +1,14 @@
 package org.mpierce.metrics.reservoir.hdrhistogram;
 
 import com.codahale.metrics.Snapshot;
-import org.HdrHistogram.Recorder;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HdrHistogramReservoirTest {
 
@@ -17,7 +16,7 @@ public class HdrHistogramReservoirTest {
 
     @Before
     public void setUp() throws Exception {
-        r = new HdrHistogramReservoir(new Recorder(2));
+        r = new HdrHistogramReservoir();
     }
 
     @Test
@@ -43,7 +42,7 @@ public class HdrHistogramReservoirTest {
 
         Snapshot snapshot = r.getSnapshot();
 
-        assertArrayEquals(expected, snapshot.getValues());
+        assertArrayFuzzyEquals(expected, snapshot.getValues(), 0.01);
     }
 
     @Test
@@ -66,6 +65,25 @@ public class HdrHistogramReservoirTest {
 
         Arrays.sort(expected);
 
-        assertArrayEquals(expected, snapshot.getValues());
+        assertArrayFuzzyEquals(expected, snapshot.getValues(), 0.01);
+    }
+
+    /**
+     * Fuzzy array equality where the fuzz permissible scales with the expected value.
+     *
+     * @param expected expected
+     * @param actual   actual
+     * @param fuzz     actual[i] must be within expected[i] * fuzz
+     */
+    static void assertArrayFuzzyEquals(long[] expected, long[] actual, double fuzz) {
+        assertEquals("length", expected.length, actual.length);
+
+        for (int i = 0; i < expected.length; i++) {
+
+            long e = expected[i];
+            long a = actual[i];
+            long delta = Math.abs(e - a);
+            assertTrue("index " + i + " expected " + e + " actual " + a, delta <= e * fuzz);
+        }
     }
 }
