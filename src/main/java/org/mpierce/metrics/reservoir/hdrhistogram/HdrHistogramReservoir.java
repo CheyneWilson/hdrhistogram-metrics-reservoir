@@ -15,7 +15,7 @@ public final class HdrHistogramReservoir implements Reservoir {
     private final Recorder recorder;
 
     @GuardedBy("this")
-    private final Histogram runningTotals = new Histogram(5);
+    private final Histogram runningTotals = new Histogram(2);
 
     /**
      * If non-null, use as destination for getIntervalHistogram.
@@ -48,15 +48,8 @@ public final class HdrHistogramReservoir implements Reservoir {
      * @return a copy of the accumulated state
      */
     private synchronized Histogram updateRunningTotals() {
-        Histogram dest = null;
-        if (intervalHistogram != null) {
-            dest = intervalHistogram;
-            intervalHistogram = null;
-        }
-
-        Histogram result = recorder.getIntervalHistogram(dest);
-        runningTotals.add(result);
-        intervalHistogram = result;
+        intervalHistogram = recorder.getIntervalHistogram(intervalHistogram);
+        runningTotals.add(intervalHistogram);
         return runningTotals.copy();
     }
 }

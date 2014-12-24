@@ -17,7 +17,7 @@ public class HdrHistogramReservoirTest {
 
     @Before
     public void setUp() throws Exception {
-        r = new HdrHistogramReservoir(new Recorder(5));
+        r = new HdrHistogramReservoir(new Recorder(2));
     }
 
     @Test
