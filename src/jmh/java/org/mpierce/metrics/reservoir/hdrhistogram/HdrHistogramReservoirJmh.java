@@ -22,19 +22,38 @@ public class HdrHistogramReservoirJmh {
     }
 
     @Benchmark
-    @Group("readWhileRecording")
+    @Group("readWhileConcurrentRecording")
     @GroupThreads(2)
-    public void recordMeasurements(GroupState groupState, ThreadState threadState) {
+    public void recordConcurrentMeasurements(GroupState groupState, ThreadState threadState) {
         groupState.reservoir.update(threadState.random.nextLong(1_000_000_000));
     }
 
     @Benchmark
-    @Group("readWhileRecording")
-    public Snapshot readSnapshots(GroupState groupState) throws InterruptedException {
+    @Group("readWhileConcurrentRecording")
+    public Snapshot readSnapshotsForConcurrentMeasurements(GroupState groupState) throws InterruptedException {
         // don't really care about the performance of reading much as it's allocation-heavy and boring.
         // Just want to perturb writing now and then to be representative.
         Thread.sleep(100);
         return groupState.reservoir.getSnapshot();
+    }
+
+    @Benchmark
+    @Group("readWhileSingleThreadedRecording")
+    @GroupThreads(1)
+    public void recordSingleThreadMeasurements(GroupState groupState, ThreadState threadState) {
+        groupState.reservoir.update(threadState.random.nextLong(1_000_000_000));
+    }
+
+    @Benchmark
+    @Group("readWhileSingleThreadedRecording")
+    public Snapshot readSnapshotsForSingleThreadMeasurements(GroupState groupState) throws InterruptedException {
+        Thread.sleep(100);
+        return groupState.reservoir.getSnapshot();
+    }
+
+    @Benchmark
+    public long baselineRandomGeneration(ThreadState threadState) throws InterruptedException {
+        return threadState.random.nextLong(1_000_000_000);
     }
 }
 
