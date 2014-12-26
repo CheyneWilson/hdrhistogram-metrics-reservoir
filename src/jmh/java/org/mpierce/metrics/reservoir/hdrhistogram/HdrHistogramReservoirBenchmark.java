@@ -9,7 +9,7 @@ import org.openjdk.jmh.annotations.State;
 
 import java.util.SplittableRandom;
 
-public class HdrHistogramReservoirJmh {
+public class HdrHistogramReservoirBenchmark {
 
     @State(Scope.Group)
     public static class GroupState {
