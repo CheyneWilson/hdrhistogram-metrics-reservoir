@@ -1,11 +1,21 @@
 package org.mpierce.metrics.reservoir.hdrhistogram;
 
 import com.codahale.metrics.Snapshot;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+import java.util.SplittableRandom;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -14,9 +24,16 @@ public class HdrHistogramReservoirTest {
 
     private HdrHistogramReservoir r;
 
+    private ExecutorService executorService = Executors.newCachedThreadPool();
+
     @Before
     public void setUp() throws Exception {
         r = new HdrHistogramReservoir();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        executorService.shutdownNow();
     }
 
     @Test
@@ -66,6 +83,31 @@ public class HdrHistogramReservoirTest {
         Arrays.sort(expected);
 
         assertArrayFuzzyEquals(expected, snapshot.getValues(), 0.01);
+    }
+
+    @Test
+    public void testConcurrentWrites() throws ExecutionException, InterruptedException {
+
+        CountDownLatch latch = new CountDownLatch(2);
+
+        List<Future<Void>> futures = new ArrayList<>();
+
+        for (int i = 0; i < 2; i++) {
+            futures.add(executorService.submit((Callable<Void>) () -> {
+                SplittableRandom random = new SplittableRandom();
+                latch.countDown();
+
+                for (int j = 0; j < 10_000_000; j++) {
+                    r.update(random.nextLong(1_000_000_000));
+                }
+
+                return null;
+            }));
+        }
+
+        for (Future<Void> future : futures) {
+            future.get();
+        }
     }
 
     /**
