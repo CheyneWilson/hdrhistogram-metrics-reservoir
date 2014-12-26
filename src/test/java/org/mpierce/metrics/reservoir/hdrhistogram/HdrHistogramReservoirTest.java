@@ -88,25 +88,28 @@ public class HdrHistogramReservoirTest {
     @Test
     public void testConcurrentWrites() throws ExecutionException, InterruptedException {
 
-        CountDownLatch latch = new CountDownLatch(2);
+        for (int round = 0; round < 100; round++) {
+            r = new HdrHistogramReservoir();
+            CountDownLatch latch = new CountDownLatch(2);
 
-        List<Future<Void>> futures = new ArrayList<>();
+            List<Future<Void>> futures = new ArrayList<>();
 
-        for (int i = 0; i < 2; i++) {
-            futures.add(executorService.submit((Callable<Void>) () -> {
-                SplittableRandom random = new SplittableRandom();
-                latch.countDown();
+            for (int i = 0; i < 2; i++) {
+                futures.add(executorService.submit((Callable<Void>) () -> {
+                    SplittableRandom random = new SplittableRandom();
+                    latch.countDown();
 
-                for (int j = 0; j < 10_000_000; j++) {
-                    r.update(random.nextLong(1_000_000_000));
-                }
+                    for (int j = 0; j < 10_000; j++) {
+                        r.update(random.nextLong(1_000_000_000));
+                    }
 
-                return null;
-            }));
-        }
+                    return null;
+                }));
+            }
 
-        for (Future<Void> future : futures) {
-            future.get();
+            for (Future<Void> future : futures) {
+                future.get();
+            }
         }
     }
 
