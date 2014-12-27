@@ -1,8 +1,8 @@
 build_image: shippableimages/ubuntu1404_java
 language: java
 jdk:
-  - oraclejdk8
-  - openjdk8
+    - oraclejdk8
+    - openjdk8
 
 script:
-  - ./gradlew check
+    - ./gradlew check
