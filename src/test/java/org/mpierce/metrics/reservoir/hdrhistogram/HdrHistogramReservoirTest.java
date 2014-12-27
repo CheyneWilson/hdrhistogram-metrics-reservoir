@@ -28,6 +28,10 @@ public class HdrHistogramReservoirTest {
 
     @Before
     public void setUp() throws Exception {
+        initReservoir();
+    }
+
+    private void initReservoir() {
         r = new HdrHistogramReservoir();
     }
 
@@ -64,32 +68,36 @@ public class HdrHistogramReservoirTest {
 
     @Test
     public void testSnapshotRandomValues() {
-        Random random = new Random();
 
+        Random random = new Random();
         long seed = random.nextLong();
         random.setSeed(seed);
         System.out.println("Using seed " + seed);
 
-        int count = 1000;
-        long[] expected = new long[count];
-        for (int i = 0; i < count; i++) {
-            long val = random.nextInt(1000_000_000);
-            r.update(val);
-            expected[i] = val;
+        for (int i = 0; i < 1000; i++) {
+            initReservoir();
+
+            int count = 1000 + random.nextInt(10000);
+            long[] expected = new long[count];
+            for (int j = 0; j < count; j++) {
+                long val = random.nextInt(1000_000_000);
+                r.update(val);
+                expected[j] = val;
+            }
+
+            Snapshot snapshot = r.getSnapshot();
+
+            Arrays.sort(expected);
+
+            assertArrayFuzzyEquals(expected, snapshot.getValues(), 0.01);
         }
-
-        Snapshot snapshot = r.getSnapshot();
-
-        Arrays.sort(expected);
-
-        assertArrayFuzzyEquals(expected, snapshot.getValues(), 0.01);
     }
 
     @Test
     public void testConcurrentWrites() throws ExecutionException, InterruptedException {
 
         for (int round = 0; round < 100; round++) {
-            r = new HdrHistogramReservoir();
+            initReservoir();
             CountDownLatch latch = new CountDownLatch(2);
 
             List<Future<Void>> futures = new ArrayList<>();

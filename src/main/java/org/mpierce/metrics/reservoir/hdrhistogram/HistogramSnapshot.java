@@ -25,7 +25,7 @@ final class HistogramSnapshot extends Snapshot {
 
     @Override
     public long[] getValues() {
-        long[] vals = new long[64];
+        long[] vals = new long[(int) histogram.getTotalCount()];
         int i = 0;
 
         for (HistogramIterationValue value : histogram.recordedValues()) {
@@ -34,22 +34,16 @@ final class HistogramSnapshot extends Snapshot {
             for (int j = 0; j < value.getCountAddedInThisIterationStep(); j++) {
                 vals[i] = val;
 
-                if (i == vals.length - 1) {
-                    // we've filled up this array; double it
-                    long[] oldVals = vals;
-                    vals = new long[vals.length * 2];
-                    System.arraycopy(oldVals, 0, vals, 0, oldVals.length);
-                }
-
                 i++;
             }
         }
 
-        // trim
-        long[] trimmed = new long[i];
-        System.arraycopy(vals, 0, trimmed, 0, i);
+        if (i != vals.length) {
+            throw new IllegalStateException(
+                "Total count was " + histogram.getTotalCount() + " but iterating values produced " + vals.length);
+        }
 
-        return trimmed;
+        return vals;
     }
 
     @Override
