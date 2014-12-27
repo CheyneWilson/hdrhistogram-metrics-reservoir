@@ -1,3 +1,5 @@
+[![Build Status](https://semaphoreapp.com/api/v1/projects/60b0719a-f47d-447f-8f85-5ced5cca143e/317138/badge.png)](https://semaphoreapp.com/marshallpierce/hdrhistogram-metrics-reservoir)
+
 A [Metrics](https://dropwizard.github.io/metrics/3.1.0/) [Reservoir](https://dropwizard.github.io/metrics/3.1.0/manual/core/#uniform-reservoirs) implementation backed by [HdrHistogram](http://hdrhistogram.org/).
 
 Put it in your `build.gradle`, then use `HdrHistogramReservoir` when you create your `Histogram` instances:
