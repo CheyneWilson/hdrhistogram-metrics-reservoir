@@ -13,7 +13,7 @@ apply plugin: 'signing'
 apply plugin: 'me.champeau.gradle.jmh'
 
 group 'org.mpierce.metrics.reservoir'
-version = '1.0-SNAPSHOT'
+version = '1.0.0'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
