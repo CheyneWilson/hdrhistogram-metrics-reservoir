@@ -2,7 +2,7 @@
 
 A [Metrics](https://dropwizard.github.io/metrics/3.1.0/) [Reservoir](https://dropwizard.github.io/metrics/3.1.0/manual/core/#uniform-reservoirs) implementation backed by [HdrHistogram](http://hdrhistogram.org/).
 
-The artifacts are published to Maven Central. If you're using gradle, put this in your `build.gradle`:
+The artifacts are [published to Maven Central](http://search.maven.org/#search|ga|1|hdrhistogram-metrics-reservoir). If you're using gradle, put this in your `build.gradle`:
 ```
 compile 'org.mpierce.metrics.reservoir:hdrhistogram-metrics-reservoir:THE_LATEST_RELEASED_VERSION'
 ```
