@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.SplittableRandom;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -96,28 +95,42 @@ public class HdrHistogramReservoirTest {
     @Test
     public void testConcurrentWrites() throws ExecutionException, InterruptedException {
 
+        int numValues = 10_000;
+        int numThreads = 4;
+
         for (int round = 0; round < 100; round++) {
             initReservoir();
-            CountDownLatch latch = new CountDownLatch(2);
 
-            List<Future<Void>> futures = new ArrayList<>();
+            long[] allValues = new long[numThreads * numValues];
 
-            for (int i = 0; i < 2; i++) {
-                futures.add(executorService.submit((Callable<Void>) () -> {
+            CountDownLatch latch = new CountDownLatch(numThreads);
+
+            List<Future<long[]>> futures = new ArrayList<>();
+
+            for (int i = 0; i < numThreads; i++) {
+                futures.add(executorService.submit(() -> {
                     SplittableRandom random = new SplittableRandom();
                     latch.countDown();
+                    latch.await();
 
-                    for (int j = 0; j < 10_000; j++) {
-                        r.update(random.nextLong(1_000_000_000));
+                    long[] values = new long[numValues];
+                    for (int j = 0; j < numValues; j++) {
+                        long randLong = random.nextLong(1_000_000_000);
+                        values[j] = randLong;
+                        r.update(randLong);
                     }
 
-                    return null;
+                    return values;
                 }));
             }
 
-            for (Future<Void> future : futures) {
-                future.get();
+            for (int i = 0; i < futures.size(); i++) {
+                System.arraycopy(futures.get(i).get(), 0, allValues, i * numValues, numValues);
             }
+
+            Arrays.sort(allValues);
+
+            assertArrayFuzzyEquals(allValues, r.getSnapshot().getValues(), 0.01);
         }
     }
 
