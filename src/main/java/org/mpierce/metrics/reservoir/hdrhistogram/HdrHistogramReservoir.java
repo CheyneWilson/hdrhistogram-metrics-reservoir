@@ -21,19 +21,30 @@ public final class HdrHistogramReservoir implements Reservoir {
     @Nonnull
     private Histogram intervalHistogram;
 
+    private final long expectedIntervalBetweenValueSamples;
+
     /**
-     * Create a reservoir with a default recorder. This recorder should be suitable for most usage.
+     * Create a reservoir with a default recorder and no coordinated omission correction. This recorder should be
+     * suitable for most usage.
      */
     public HdrHistogramReservoir() {
-        this(new Recorder(2));
+        this(newDefaultRecorder());
     }
 
     /**
-     * Create a reservoir with a user-specified recorder.
+     * Create a reservoir with a user-specified recorder and no coordinated omission correction.
      *
      * @param recorder Recorder to use
      */
     public HdrHistogramReservoir(Recorder recorder) {
+        this(recorder, 0);
+    }
+
+    /**
+     * @param recorder Recorder to use
+     * @param expectedIntervalBetweenValueSamples
+     */
+    public HdrHistogramReservoir(Recorder recorder, long expectedIntervalBetweenValueSamples) {
         this.recorder = recorder;
 
         /*
@@ -45,6 +56,16 @@ public final class HdrHistogramReservoir implements Reservoir {
          */
         intervalHistogram = recorder.getIntervalHistogram();
         runningTotals = new Histogram(intervalHistogram.getNumberOfSignificantValueDigits());
+        this.expectedIntervalBetweenValueSamples = expectedIntervalBetweenValueSamples;
+    }
+
+    /**
+     * Useful if you're using constructor that takes a Recorder but you just want the defaults for the Recorder.
+     *
+     * @return a new Recorder with the default configuration
+     */
+    public static Recorder newDefaultRecorder() {
+        return new Recorder(2);
     }
 
     @Override
@@ -69,7 +90,7 @@ public final class HdrHistogramReservoir implements Reservoir {
     @Nonnull
     private synchronized Histogram updateRunningTotals() {
         intervalHistogram = recorder.getIntervalHistogram(intervalHistogram);
-        runningTotals.add(intervalHistogram);
+        runningTotals.addWhileCorrectingForCoordinatedOmission(intervalHistogram, expectedIntervalBetweenValueSamples);
         return runningTotals.copy();
     }
 }
