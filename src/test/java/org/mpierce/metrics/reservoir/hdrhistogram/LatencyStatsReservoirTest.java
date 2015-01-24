@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.SplittableRandom;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -58,7 +58,6 @@ public class LatencyStatsReservoirTest {
 
     @Test
     public void testSnapshotValues() {
-
         int count = 1000;
         long[] expected = new long[count];
         for (int i = 0; i < count; i++) {
@@ -73,7 +72,6 @@ public class LatencyStatsReservoirTest {
 
     @Test
     public void testSnapshotRandomValues() {
-
         Random random = new Random();
         long seed = random.nextLong();
         random.setSeed(seed);
@@ -100,8 +98,7 @@ public class LatencyStatsReservoirTest {
 
     @Test
     public void testConcurrentWrites() throws ExecutionException, InterruptedException {
-
-        int numValues = 10_000;
+        final int numValues = 10_000;
         int numThreads = 4;
 
         for (int round = 0; round < 100; round++) {
@@ -109,25 +106,32 @@ public class LatencyStatsReservoirTest {
 
             long[] allValues = new long[numThreads * numValues];
 
-            CountDownLatch latch = new CountDownLatch(numThreads);
+            final CountDownLatch latch = new CountDownLatch(numThreads);
 
             List<Future<long[]>> futures = new ArrayList<>();
 
             for (int i = 0; i < numThreads; i++) {
-                futures.add(executorService.submit(() -> {
-                    SplittableRandom random = new SplittableRandom();
-                    latch.countDown();
-                    latch.await();
+                futures.add(executorService.submit(
+                    new Callable<long[]>() {
+                        @Override
+                        public long[] call() throws Exception {
+                            Random random = new Random();
+                            latch.countDown();
+                            latch.await();
 
-                    long[] values = new long[numValues];
-                    for (int j = 0; j < numValues; j++) {
-                        long randLong = random.nextLong(1_000_000_000) + MEASUREMENT_OFFSET;
-                        values[j] = randLong;
-                        r.update(randLong);
+                            long[] values = new long[numValues];
+                            for (int j = 0; j < numValues; j++) {
+                                long randLong =
+                                    random.nextInt(1_000_000_000) + MEASUREMENT_OFFSET;
+                                values[j] = randLong;
+                                r.update(randLong);
+                            }
+
+                            return values;
+                        }
                     }
 
-                    return values;
-                }));
+                ));
             }
 
             for (int i = 0; i < futures.size(); i++) {
