@@ -17,13 +17,9 @@ public final class LatencyStatsReservoir implements Reservoir {
     @GuardedBy("this")
     private final Histogram runningTotals;
 
-    @GuardedBy("this")
-    @Nonnull
-    private Histogram intervalHistogram;
-
     public LatencyStatsReservoir(LatencyStats stats) {
         this.stats = stats;
-        intervalHistogram = stats.getIntervalHistogram();
+        Histogram intervalHistogram = stats.getIntervalHistogram();
         runningTotals = new Histogram(intervalHistogram.getNumberOfSignificantValueDigits());
     }
 
@@ -48,7 +44,6 @@ public final class LatencyStatsReservoir implements Reservoir {
     @Nonnull
     private synchronized Histogram updateRunningTotals() {
         stats.addIntervalHistogramTo(runningTotals);
-        runningTotals.add(intervalHistogram);
         return runningTotals.copy();
     }
 }
