@@ -7,7 +7,7 @@ import org.openjdk.jmh.annotations.GroupThreads;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 
-import java.util.SplittableRandom;
+import java.util.Random;
 
 public class HdrHistogramReservoirBenchmark {
 
@@ -18,14 +18,14 @@ public class HdrHistogramReservoirBenchmark {
 
     @State(Scope.Thread)
     public static class ThreadState {
-        final SplittableRandom random = new SplittableRandom();
+        final Random random = new Random();
     }
 
     @Benchmark
     @Group("readWhileConcurrentRecording")
     @GroupThreads(2)
     public void recordConcurrentMeasurements(GroupState groupState, ThreadState threadState) {
-        groupState.reservoir.update(threadState.random.nextLong(1_000_000_000));
+        groupState.reservoir.update(threadState.random.nextInt(1_000_000_000));
     }
 
     @Benchmark
@@ -41,7 +41,7 @@ public class HdrHistogramReservoirBenchmark {
     @Group("readWhileSingleThreadedRecording")
     @GroupThreads(1)
     public void recordSingleThreadMeasurements(GroupState groupState, ThreadState threadState) {
-        groupState.reservoir.update(threadState.random.nextLong(1_000_000_000));
+        groupState.reservoir.update(threadState.random.nextInt(1_000_000_000));
     }
 
     @Benchmark
@@ -53,7 +53,7 @@ public class HdrHistogramReservoirBenchmark {
 
     @Benchmark
     public long baselineRandomGeneration(ThreadState threadState) throws InterruptedException {
-        return threadState.random.nextLong(1_000_000_000);
+        return threadState.random.nextInt(1_000_000_000);
     }
 }
 

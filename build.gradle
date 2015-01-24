@@ -21,7 +21,7 @@ repositories {
   jcenter()
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
   testCompile 'junit:junit:4.11'
