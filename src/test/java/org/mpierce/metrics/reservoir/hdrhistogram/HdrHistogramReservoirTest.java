@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.SplittableRandom;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -95,7 +95,7 @@ public class HdrHistogramReservoirTest {
     @Test
     public void testConcurrentWrites() throws ExecutionException, InterruptedException {
 
-        int numValues = 10_000;
+        final int numValues = 10_000;
         int numThreads = 4;
 
         for (int round = 0; round < 100; round++) {
@@ -103,25 +103,32 @@ public class HdrHistogramReservoirTest {
 
             long[] allValues = new long[numThreads * numValues];
 
-            CountDownLatch latch = new CountDownLatch(numThreads);
+            final CountDownLatch latch = new CountDownLatch(numThreads);
 
             List<Future<long[]>> futures = new ArrayList<>();
 
             for (int i = 0; i < numThreads; i++) {
-                futures.add(executorService.submit(() -> {
-                    SplittableRandom random = new SplittableRandom();
-                    latch.countDown();
-                    latch.await();
+                futures.add(executorService.submit(
+                    new Callable<long[]>() {
+                        @Override
+                        public long[] call() throws InterruptedException {
 
-                    long[] values = new long[numValues];
-                    for (int j = 0; j < numValues; j++) {
-                        long randLong = random.nextLong(1_000_000_000);
-                        values[j] = randLong;
-                        r.update(randLong);
+                            Random random = new Random();
+                            latch.countDown();
+                            latch.await();
+
+                            long[] values = new long[numValues];
+                            for (int j = 0; j < numValues; j++) {
+                                long randLong = random.nextInt(1_000_000_000);
+                                values[j] = randLong;
+                                r.update(randLong);
+                            }
+
+                            return values;
+                        }
                     }
 
-                    return values;
-                }));
+                ));
             }
 
             for (int i = 0; i < futures.size(); i++) {
@@ -141,6 +148,7 @@ public class HdrHistogramReservoirTest {
      * @param actual   actual
      * @param fuzz     actual[i] must be within expected[i] * fuzz
      */
+
     static void assertArrayFuzzyEquals(long[] expected, long[] actual, double fuzz) {
         assertEquals("length", expected.length, actual.length);
 
