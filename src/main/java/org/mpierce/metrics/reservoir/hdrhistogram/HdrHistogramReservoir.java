@@ -58,13 +58,16 @@ public final class HdrHistogramReservoir implements Reservoir {
         recorder.recordValue(value);
     }
 
+    /**
+     * @return the data accumulated since the reservoir was created
+     */
     @Override
     public Snapshot getSnapshot() {
         return new HistogramSnapshot(updateRunningTotals());
     }
 
     /**
-     * @return a copy of the accumulated state
+     * @return a copy of the accumulated state since the reservoir was created
      */
     @Nonnull
     private synchronized Histogram updateRunningTotals() {
