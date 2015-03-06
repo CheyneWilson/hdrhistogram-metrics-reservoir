@@ -17,6 +17,8 @@ version = '1.0.2-SNAPSHOT'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
+defaultTasks 'build'
+
 repositories {
   jcenter()
 }
@@ -96,6 +98,6 @@ uploadArchives {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.2.1'
+  gradleVersion = '2.3'
 }
 
