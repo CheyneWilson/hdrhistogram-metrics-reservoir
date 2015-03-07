@@ -11,7 +11,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A Reservoir that resets its internal state every time a snapshot is taken. This is useful if you're using snapshots
- * as a means of defining the window in which you want to calculate, say, the 99.9th percentage.
+ * as a means of defining the window in which you want to calculate, say, the 99.9th percentile.
  */
 @ThreadSafe
 public final class HdrHistogramResetOnSnapshotReservoir implements Reservoir {
