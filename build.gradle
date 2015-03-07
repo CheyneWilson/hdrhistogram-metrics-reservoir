@@ -47,6 +47,10 @@ signing {
   sign configurations.archives
 }
 
+release {
+  tagPrefix = 'v'
+}
+
 uploadArchives {
   repositories {
     mavenDeployer {
