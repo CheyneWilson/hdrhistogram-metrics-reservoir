@@ -1,9 +1,6 @@
 package org.mpierce.metrics.reservoir.hdrhistogram;
 
 import com.codahale.metrics.Snapshot;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,16 +10,9 @@ import static org.mpierce.metrics.reservoir.hdrhistogram.HdrHistogramReservoirTe
 public class HdrHistogramResetOnSnapshotReservoirTest {
     private HdrHistogramResetOnSnapshotReservoir r;
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
-
     @Before
     public void setUp() throws Exception {
         r = new HdrHistogramResetOnSnapshotReservoir();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        executorService.shutdownNow();
     }
 
     @Test
