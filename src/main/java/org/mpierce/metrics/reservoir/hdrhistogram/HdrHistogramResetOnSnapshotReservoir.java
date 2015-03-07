@@ -42,7 +42,6 @@ public final class HdrHistogramResetOnSnapshotReservoir implements Reservoir {
          * - it starts our counting at zero. Arguably this might be a bad thing if you wanted to feed in
          *   a recorder that already had some measurements? But that seems crazy.
          * - intervalHistogram can be nonnull.
-         * - it lets us figure out the number of significant digits to use in runningTotals.
          */
         intervalHistogram = recorder.getIntervalHistogram();
     }
