@@ -7,7 +7,10 @@ The artifacts are [published to Maven Central](http://search.maven.org/#search|g
 compile 'org.mpierce.metrics.reservoir:hdrhistogram-metrics-reservoir:THE_LATEST_RELEASED_VERSION'
 ```
 
-Then, use `HdrHistogramReservoir` when you create your `Histogram` instances.
+Then, use the following reservoir implementations when you create your `Histogram` or `Timer` instances:
+
+- `HdrHistogramReserver`, a reservoir that accumulates its internal state forever
+- `HdrHistogramResetOnSnapshotReservoir`, a reservoir that resets its internal state on each snapshot (which is how reporters get information from reservoirs). See [this article](http://taint.org/2014/01/16/145944a.html) for when that is useful.
 
 See http://hdrhistogram.org/ for why you want HdrHistogram as the underlying data structure, or watch [Gil Tene talking about how latency is hard to measure well](http://www.infoq.com/presentations/latency-pitfalls), or read [this thread](https://groups.google.com/forum/#!msg/mechanical-sympathy/I4JfZQ1GYi8/ocuzIyC3N9EJ). The short version:
 

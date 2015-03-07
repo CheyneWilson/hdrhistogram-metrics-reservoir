@@ -9,13 +9,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
+/**
+ * A Reservoir that resets its internal state every time a snapshot is taken. This is useful if you're using snapshots
+ * as a means of defining the window in which you want to calculate, say, the 99.9th percentile.
+ */
 @ThreadSafe
-public final class HdrHistogramReservoir implements Reservoir {
+public final class HdrHistogramResetOnSnapshotReservoir implements Reservoir {
 
     private final Recorder recorder;
-
-    @GuardedBy("this")
-    private final Histogram runningTotals;
 
     @GuardedBy("this")
     @Nonnull
@@ -24,7 +25,7 @@ public final class HdrHistogramReservoir implements Reservoir {
     /**
      * Create a reservoir with a default recorder. This recorder should be suitable for most usage.
      */
-    public HdrHistogramReservoir() {
+    public HdrHistogramResetOnSnapshotReservoir() {
         this(new Recorder(2));
     }
 
@@ -33,7 +34,7 @@ public final class HdrHistogramReservoir implements Reservoir {
      *
      * @param recorder Recorder to use
      */
-    public HdrHistogramReservoir(Recorder recorder) {
+    public HdrHistogramResetOnSnapshotReservoir(Recorder recorder) {
         this.recorder = recorder;
 
         /*
@@ -41,10 +42,8 @@ public final class HdrHistogramReservoir implements Reservoir {
          * - it starts our counting at zero. Arguably this might be a bad thing if you wanted to feed in
          *   a recorder that already had some measurements? But that seems crazy.
          * - intervalHistogram can be nonnull.
-         * - it lets us figure out the number of significant digits to use in runningTotals.
          */
         intervalHistogram = recorder.getIntervalHistogram();
-        runningTotals = new Histogram(intervalHistogram.getNumberOfSignificantValueDigits());
     }
 
     @Override
@@ -59,20 +58,19 @@ public final class HdrHistogramReservoir implements Reservoir {
     }
 
     /**
-     * @return the data accumulated since the reservoir was created
+     * @return the data since the last snapshot was taken
      */
     @Override
     public Snapshot getSnapshot() {
-        return new HistogramSnapshot(updateRunningTotals());
+        return new HistogramSnapshot(getDataSinceLastSnapshotAndReset());
     }
 
     /**
-     * @return a copy of the accumulated state since the reservoir was created
+     * @return a copy of the accumulated state since the reservoir last had a snapshot
      */
     @Nonnull
-    private synchronized Histogram updateRunningTotals() {
+    private synchronized Histogram getDataSinceLastSnapshotAndReset() {
         intervalHistogram = recorder.getIntervalHistogram(intervalHistogram);
-        runningTotals.add(intervalHistogram);
-        return runningTotals.copy();
+        return intervalHistogram.copy();
     }
 }
