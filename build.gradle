@@ -7,7 +7,6 @@ plugins {
 }
 
 group 'org.mpierce.metrics.reservoir'
-version = '1.0.2-SNAPSHOT'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
