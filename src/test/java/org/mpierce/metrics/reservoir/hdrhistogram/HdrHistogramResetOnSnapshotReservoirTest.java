@@ -56,7 +56,7 @@ public class HdrHistogramResetOnSnapshotReservoirTest {
     }
 
     @Test
-    public void testResetsOnSNapshot() {
+    public void testResetsOnSnapshot() {
         r.update(1);
         r.update(2);
         r.update(3);
