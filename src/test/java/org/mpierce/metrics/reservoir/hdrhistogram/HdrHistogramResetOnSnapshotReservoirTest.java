@@ -17,10 +17,6 @@ public class HdrHistogramResetOnSnapshotReservoirTest {
 
     @Before
     public void setUp() throws Exception {
-        initReservoir();
-    }
-
-    private void initReservoir() {
         r = new HdrHistogramResetOnSnapshotReservoir();
     }
 
