@@ -20,9 +20,9 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
   testCompile 'junit:junit:4.12'
-  compile 'com.google.code.findbugs:jsr305:3.0.0'
-  compile 'io.dropwizard.metrics:metrics-core:3.1.1'
-  compile 'org.hdrhistogram:HdrHistogram:2.1.6'
+  compile 'com.google.code.findbugs:jsr305:3.0.1'
+  compile 'io.dropwizard.metrics:metrics-core:3.1.2'
+  compile 'org.hdrhistogram:HdrHistogram:2.1.8'
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
@@ -95,6 +95,6 @@ uploadArchives {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.3'
+  gradleVersion = '2.9'
 }
 
