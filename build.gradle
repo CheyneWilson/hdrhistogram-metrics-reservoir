@@ -3,7 +3,7 @@ plugins {
   id 'maven'
   id 'signing'
   id 'me.champeau.gradle.jmh' version '0.1.3'
-  id 'net.researchgate.release' version '2.0.2'
+  id 'net.researchgate.release' version '2.3.4'
 }
 
 group 'org.mpierce.metrics.reservoir'
@@ -47,7 +47,7 @@ signing {
 }
 
 release {
-  tagPrefix = 'v'
+  tagTemplate = 'v$version'
 }
 
 uploadArchives {
