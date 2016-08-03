@@ -1,7 +1,7 @@
 plugins {
   id 'java'
   id 'maven-publish'
-  id 'me.champeau.gradle.jmh' version '0.2.0'
+  id 'me.champeau.gradle.jmh' version '0.3.0'
   id 'net.researchgate.release' version '2.3.4'
   id 'com.jfrog.bintray' version '1.5'
 }
@@ -26,7 +26,7 @@ dependencies {
 }
 
 jmh {
-  jmhVersion = '1.11.3'
+  jmhVersion = '1.13'
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
@@ -80,6 +80,6 @@ bintray {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.9'
+  gradleVersion = '2.14.1'
 }
 
