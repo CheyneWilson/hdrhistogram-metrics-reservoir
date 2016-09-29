@@ -7,6 +7,8 @@ The artifacts are [published to Bintray](https://bintray.com/marshallpierce/mave
 compile 'org.mpierce.metrics.reservoir:hdrhistogram-metrics-reservoir:THE_LATEST_RELEASED_VERSION'
 ```
 
+Or, if you're on Maven, see the Set Me Up button at https://bintray.com/bintray/jcenter and then add the dependency.
+
 Then, use the following reservoir implementations when you create your `Histogram` or `Timer` instances:
 
 - `HdrHistogramReservoir`, a reservoir that accumulates its internal state forever
