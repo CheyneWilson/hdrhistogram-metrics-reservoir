@@ -1,9 +1,9 @@
 plugins {
   id 'java'
   id 'maven-publish'
-  id 'me.champeau.gradle.jmh' version '0.3.0'
-  id 'net.researchgate.release' version '2.3.4'
-  id 'com.jfrog.bintray' version '1.5'
+  id 'me.champeau.gradle.jmh' version '0.3.1'
+  id 'net.researchgate.release' version '2.4.1'
+  id 'com.jfrog.bintray' version '1.7.2'
 }
 
 group 'org.mpierce.metrics.reservoir'
@@ -22,11 +22,11 @@ dependencies {
   testCompile 'junit:junit:4.12'
   compile 'com.google.code.findbugs:jsr305:3.0.1'
   compile 'io.dropwizard.metrics:metrics-core:3.1.2'
-  compile 'org.hdrhistogram:HdrHistogram:2.1.8'
+  compile 'org.hdrhistogram:HdrHistogram:2.1.9'
 }
 
 jmh {
-  jmhVersion = '1.13'
+  jmhVersion = '1.15'
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
@@ -77,9 +77,5 @@ bintray {
       vcsTag = 'v' + project.version
     }
   }
-}
-
-task wrapper(type: Wrapper) {
-  gradleVersion = '2.14.1'
 }
 

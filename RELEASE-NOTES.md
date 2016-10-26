@@ -1,3 +1,7 @@
+# 1.1.2
+
+- Update HdrHistogram to 2.1.9
+
 # 1.1.1
  
 - Licensed under COIL 0.5 for even more business friendliness
